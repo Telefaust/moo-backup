@@ -1,5 +1,6 @@
 gui/profiles.json
 gui/keys/
+backups/
 build/
 dist/
 __pycache__/
