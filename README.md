@@ -2,7 +2,7 @@
 
 Система резервного копирования сайта на Moodle: bash-скрипты на Linux-хосте и GUI под Windows.
 
-**Последнее обновление:** 24 июня 2026
+**Последнее обновление:** 28 июня 2026
 
 ---
 
@@ -46,6 +46,8 @@
 
 ## Быстрый старт (Windows)
 
+![Основной экран](docs\screenshots\Mainscreen.jpg)
+
 1. Запустите **`run-gui.bat`** (двойной щелчок) или вручную:
 
 ```powershell
@@ -57,7 +59,7 @@ python gui/main.py
 ```
 
 2. В окне **Connections…** создайте подключение: SSH host/login/password, пути Moodle и архива.  
-   При первом запуске portable/exe окно **Connections** открывается автоматически.
+   При первом запуске portable/exe окно **Connections** открывается автоматически. ![Connections](docs\screenshots\Connections.jpg)
 3. **Connect** → **Deploy scripts**.
 4. На хосте (один раз): права на dataroot и CLI bootstrap — см. [Настройка хоста](#настройка-хоста-linux) (`--check-only` или ACL).
 5. Установите плагины `local_backupnotice` (баннер) и **`quizaccess_backupnotice`** (блок новых попыток quiz во время ожидания).
