@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "active_id": "example",
+  "profiles": {
+    "example": {
+      "name": "Example Moodle host",
+      "host": "192.168.1.10",
+      "login": "scripter",
+      "password": "change-me",
+      "fqdn": "https://moodle.example.com",
+      "location": "/var/www/moodle",
+      "storage_path": "/home/scripter/moobackup",
+      "archive_path": "D:\\Backups\\Moodle",
+      "remote_bin": "~/moobackup/bin"
+    }
+  }
+}

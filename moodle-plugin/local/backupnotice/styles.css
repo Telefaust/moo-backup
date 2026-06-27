@@ -1,0 +1,35 @@
+.local-backupnotice-banner {
+    position: sticky;
+    top: 0;
+    z-index: 1035;
+    width: 100%;
+    background: #8a6d003;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.local-backupnotice-inner {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0.65rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.local-backupnotice-line {
+    font-weight: 600;
+}
+
+.local-backupnotice-countdown-value {
+    font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 768px) {
+    .local-backupnotice-inner {
+        white-space: nowrap;
+    }
+}

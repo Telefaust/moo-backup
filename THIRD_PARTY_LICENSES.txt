@@ -1,0 +1,57 @@
+Third-Party Licenses
+====================
+
+Moo-backup bundles the following third-party Python packages in its portable
+distribution (_internal\ directory). Their licenses are listed below.
+
+
+paramiko 5.0.0
+--------------
+License: LGPL-2.1
+Homepage: https://www.paramiko.org/
+Source:   https://github.com/paramiko/paramiko
+
+Moo-backup uses paramiko as a dynamically-loaded library for SSH/SFTP
+connectivity. In accordance with LGPL-2.1, the paramiko source code is
+available at the URL above. Users may replace the bundled paramiko with a
+modified version by reinstalling from source and rebuilding the portable
+package with build-gui.ps1.
+
+
+cryptography 49.0.0
+--------------------
+License: Apache-2.0 OR BSD-3-Clause
+Homepage: https://cryptography.io/
+Source:   https://github.com/pyca/cryptography
+
+
+bcrypt 5.0.0
+-------------
+License: Apache-2.0
+Homepage: https://github.com/pyca/bcrypt
+
+
+PyNaCl 1.6.2
+-------------
+License: Apache-2.0
+Homepage: https://github.com/pyca/pynacl
+
+
+cffi 2.0.0
+----------
+License: MIT
+Homepage: https://cffi.readthedocs.io/
+Source:   https://github.com/python-cffi/cffi
+
+
+pycparser 3.0
+-------------
+License: BSD-3-Clause
+Homepage: https://github.com/eliben/pycparser
+
+
+invoke 3.0.3
+------------
+License: BSD-2-Clause
+Homepage: https://www.pyinvoke.org/
+Source:   https://github.com/pyinvoke/invoke
