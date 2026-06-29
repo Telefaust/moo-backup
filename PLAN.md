@@ -20,7 +20,7 @@
 
 | Уровень | Файл | Содержимое |
 |---------|------|------------|
-| Windows GUI | `gui/profiles.json` | SSH, пути, секреты |
+| Windows GUI | `gui/profiles.json` | SSH, пути, секреты; *(план P1)* опц. extra DB / code / data |
 | Windows GUI | `gui/keys/<id>/` | Ed25519 ключи |
 | Linux host | `~/moobackup/bin/moodle-backup.env` | `BACKUPER_*`, опционально `MOOBACKUP_QUIZ_PHP` |
 
@@ -118,7 +118,7 @@ Moo-backup/
 **Архивация:**
 
 8. Maintenance ON → remove banner.
-9. DB / code / moodledata / finalize (или `simulate_backup_data`, delay по `--simulate-seconds`, default 5).
+9. DB / code / moodledata / *(план P1)* extra DB/code/data / finalize (или `simulate_backup_data`, delay по `--simulate-seconds`, default 5).
 10. Maintenance OFF.
 
 ---
@@ -568,6 +568,7 @@ flowchart LR
 - [ ] `run-gui.bat`: проверка «свой ли venv», пересоздание при необходимости
 - [ ] GUI Connections: микроавтоматизация обнаружения Moodle / путей
 - [ ] Email-уведомления о бэкапе (cron / ошибки / опционально успех)
+- [ ] Extra DB / code / data в профиле соединения (P1)
 - [ ] Скрипт первичной установки плагинов (root / CLI)
 
 ---
@@ -584,6 +585,7 @@ flowchart LR
 | P0 | Lock при любом бэкапе (ручной + cron) | запланировано (часть automation) |
 | P1 | Автоматизация: cron, ротация, offsite | запланировано |
 | P1 | Quiz timeout + force для cron | запланировано |
+| P1 | Extra DB / code / data (профиль соединения) | запланировано |
 | P1 | Уведомления email | запланировано |
 | P2 | Здоровье бэкапов в GUI, checksum verify | запланировано |
 | P2 | Микроавтоматизация Connections | запланировано |
@@ -637,6 +639,70 @@ flowchart LR
 4. Для ручного бэкапа в GUI — текущее поведение (ожидание + Force/Cancel) без изменений, если не выбрана иная политика.
 
 **Вывод в лог / GUI:** `@QUIZ_TIMEOUT_POLICY …`, предупреждения о бесконечных quiz до старта wait.
+
+---
+
+### P1: Extra DB / code / data (профиль соединения)
+
+**Цель:** на одном хосте бэкапить вместе с Moodle **дополнительную** базу и/или каталоги кода и данных (отдельное приложение, legacy-стек, общий dataroot-сосед) — без отдельного job и без смешивания в `database.sql.gz` / `moodlecode.tar.gz` / `moodledata.tar.gz`.
+
+**Профиль соединения** (`gui/profiles.json`, **Connections…**) — три **опциональных** поля:
+
+| Поле | Назначение |
+|------|------------|
+| Extra database name | Имя БД для `mysqldump` (те же credentials, что у Moodle, из `config.php`) |
+| Extra code path | Абсолютный путь к каталогу кода на хосте |
+| Extra data path | Абсолютный путь к каталогу данных на хосте |
+
+Пустые поля = компонент не бэкапится. Заполнено **любое подмножество** — бэкапятся только указанные части.
+
+**Deploy:** значения попадают в `~/moobackup/bin/moodle-backup.env` (например `BACKUPER_EXTRA_DB`, `BACKUPER_EXTRA_CODE`, `BACKUPER_EXTRA_DATA`) вместе с `BACKUPER_*`.
+
+**Артефакты** (в том же каталоге `YYYY-MM-DD_HH-MM-SS/`, что и Moodle):
+
+| Компонент | Файл | Условие |
+|-----------|------|---------|
+| Extra DB | `extrabase.sql.gz` | указано имя БД |
+| Extra code | `extracode.tar.gz` | указан code path |
+| Extra data | `extradata.tar.gz` | указан data path |
+
+Логика архивации — **однотипно Moodle** (тот же `database.sh` / `archive.sh`, те же исключения для code/data, что применимы; `--full` для moodledata **не** распространяется на extra без отдельного решения).
+
+**`manifest.json`** — секция `extra` (или аналог), только для включённых компонентов, например:
+
+```json
+"extra": {
+  "database": "otherapp",
+  "code_path": "/var/www/otherapp",
+  "data_path": "/data/otherapp",
+  "files": ["extrabase.sql.gz", "extracode.tar.gz"]
+}
+```
+
+**Restore** (`moodle-restore.sh`, GUI Restore): восстанавливать extra **в том же прогоне**, что и основной бэкап — после или параллельно с Moodle (порядок: БД → code → data; пути назначения из manifest / env). Пропускать отсутствующие в каталоге бэкапа файлы.
+
+**GUI — списки Remote / Local:**
+
+- если в бэкапе есть **хотя бы один** extra-артефакт — префикс метки **`[EXTRA]`** к отображаемому имени каталога (например `[EXTRA] 2026-06-28_02-00-00`);
+- если extra не настроен или не создан ни один extra-файл — метка **не** показывается, поведение как сейчас.
+
+**Quiz / maintenance:** без изменений — extra архивируется **после** quiz-prep и maintenance ON, в общем шаге архивации (или сразу после Moodle-компонентов, до finalize).
+
+**Simulate (`--simulate`):** при наличии extra в профиле — те же паузы/пропуск dump/tar, что для Moodle; в manifest `"simulated": true` и перечень запланированных extra-файлов.
+
+**Права на хосте:** read на указанные каталоги; для extra DB — те же права dump, что для Moodle DB. Документировать в README; при необходимости расширить `--check-only` ACL-скрипта (опционально).
+
+**Задачи для реализации:**
+
+- [ ] Поля в `profiles.py`, `settings_dialog.py`, `profiles.json.example`
+- [ ] `BackuperConfig` + deploy в `moodle-backup.env`
+- [ ] `remote/lib/database.sh`, `archive.sh`, `moodle-backup.sh` — условный dump/tar extra
+- [ ] `manifest.json` — блок `extra`
+- [ ] `restore/moodle-restore.sh`, `RESTORE.md` — restore extra
+- [ ] GUI: `[EXTRA]` в remote/local list; restore без отдельного диалога для extra (пути из manifest)
+- [ ] README: описание полей и артефактов
+
+**Критерий готовности:** профиль с одним полем (только DB) → бэкап с `extrabase.sql.gz` и `[EXTRA]`; профиль с тремя полями → три файла; пустой профиль extra → только Moodle, без метки; restore на зеркале восстанавливает Moodle + extra.
 
 ---
 
