@@ -1,5 +1,6 @@
 gui/profiles.json
 gui/keys/
+.env
 backups/
 build/
 dist/
