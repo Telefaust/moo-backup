@@ -22,7 +22,7 @@ init_logging() {
     : > "${LOG_FILE}"
     exec > >(tee -a "${LOG_FILE}") 2>&1
     LOGGING_TEE_ACTIVE=true
-    log_info "Backup started"
+    log_info "Backup started (Moo-backup v${MOOBACKUP_VERSION})"
     log_info "Moodle root: ${MOODLE_ROOT}"
     log_info "Storage: ${BACKUPER_STORAGE_PATH}"
     log_info "Backup directory: ${BACKUP_DIR}"

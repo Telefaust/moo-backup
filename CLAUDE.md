@@ -33,7 +33,9 @@ First run without `gui/profiles.json` opens the Connections dialog automatically
 | `moodle-plugin/local/backupnotice/` | Site banner plugin (v1.0.2) |
 | `moodle-plugin/quizaccess/backupnotice/` | Quiz access rule plugin |
 | `restore/moodle-restore.sh` | Restore script (not live-tested yet) |
-| `build-gui.ps1` | PyInstaller build → `dist\Moo-backup-portable.zip` |
+| `build-gui.ps1` | PyInstaller build → `dist\Moo-backup-portable-<version>.zip` |
+| `VERSION` | Project version (SemVer), single source of truth; read by `gui/version.py`, deployed to `~/moobackup/bin/VERSION` |
+| `CHANGELOG.md` | Keep a Changelog: `[Unreleased]` + one section per release |
 | `moodle-plugin/build-zip.py` | Plugin ZIPs → `moodle-plugin/dist/` |
 
 ---
@@ -80,6 +82,9 @@ Copyright: `Andrey "Telefaust" Bogachev`
 ### Always on changes
 - Update `**Последнее обновление:**` in **README.md** and **PLAN.md** in the same commit
 
+- Record changes in `CHANGELOG.md` under `[Unreleased]`
+- Release: bump `VERSION`, move `[Unreleased]` to `[X.Y.Z] — date`, tag `vX.Y.Z` manually. Plugins keep their own versions (`version.php`)
+
 ### Never commit
 - `gui/profiles.json` — SSH credentials, in `.gitignore`
 - `gui/keys/` — SSH private keys, in `.gitignore`
@@ -95,7 +100,7 @@ Both are in `.gitignore`; contain absolute paths from build machine.
 .\build-gui.ps1
 ```
 
-Output: `dist\Moo-backup-portable.zip`
+Output: `dist\Moo-backup-portable-<version>.zip`
 Also builds plugin ZIPs via `moodle-plugin\build-zip.py` → `moodle-plugin\dist\*.zip`
 
 Before each release: smoke-test the ZIP on a machine without Python (see Roadmap in PLAN.md).

@@ -72,6 +72,7 @@ write_manifest() {
 
     cat > "${manifest}" <<EOF
 {
+  "moo_backup_version": "${MOOBACKUP_VERSION}",
   "timestamp": "$(date -Iseconds 2>/dev/null || date)",
   "backup_dir": "$(basename "${BACKUP_DIR}")",
   "format": "multi-file",

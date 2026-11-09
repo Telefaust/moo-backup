@@ -10,6 +10,7 @@ from tkinter import messagebox, scrolledtext, ttk
 from gui.config import BackuperConfig, PROJECT_ROOT
 from gui.profiles import ProfileStore
 from gui.ssh_client import SSHClient
+from gui.version import get_version
 from gui.ui.settings_dialog import SettingsDialog
 
 
@@ -71,7 +72,7 @@ class BackuperApp(tk.Tk):
         self._quiz_poll_after: str | None = None
         self._backup_waiting_quiz = False
 
-        self.title("Moo-backup — Moodle Backup Manager")
+        self.title(f"Moo-backup v{get_version()} — Moodle Backup Manager")
         self.geometry("960x680")
         self.minsize(800, 560)
 
@@ -903,7 +904,7 @@ def run_app() -> None:
 
     while not _profile_ready(store):
         bootstrap = tk.Tk()
-        bootstrap.title("Moo-backup")
+        bootstrap.title(f"Moo-backup v{get_version()}")
         bootstrap.geometry("1x1+0+0")
         bootstrap.overrideredirect(True)
         bootstrap.update_idletasks()

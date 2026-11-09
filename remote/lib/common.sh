@@ -7,6 +7,12 @@ LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REMOTE_BIN_DIR="$(cd "${LIB_DIR}/.." && pwd)"
 
 # Exit codes
+MOOBACKUP_VERSION="unknown"
+if [[ -r "${REMOTE_BIN_DIR}/VERSION" ]]; then
+    MOOBACKUP_VERSION="$(tr -d '[:space:]' < "${REMOTE_BIN_DIR}/VERSION")"
+    [[ -n "${MOOBACKUP_VERSION}" ]] || MOOBACKUP_VERSION="unknown"
+fi
+
 readonly EXIT_OK=0
 readonly EXIT_CONFIG=1
 readonly EXIT_MAINTENANCE=2

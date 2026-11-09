@@ -65,14 +65,14 @@ function Copy-PluginPackage {
         throw "Missing plugin dist directory: $distSrc (build-zip.py should create it)"
     }
 
-    $licenseSrc = Join-Path $Root 'moodle-plugin\LICENSE'
+    $licenseSrc = Join-Path $Root 'moodle-plugin\LICENSE.txt'
     if (-not (Test-Path -LiteralPath $licenseSrc)) {
         throw "Missing file: $licenseSrc"
     }
 
     New-Item -ItemType Directory -Force -Path $pluginDistDest | Out-Null
     Copy-Item -LiteralPath $readmeSrc -Destination (Join-Path $pluginDest 'README.md') -Force
-    Copy-Item -LiteralPath $licenseSrc -Destination (Join-Path $pluginDest 'LICENSE') -Force
+    Copy-Item -LiteralPath $licenseSrc -Destination (Join-Path $pluginDest 'LICENSE.txt') -Force
 
     $patterns = @(
         'local_backupnotice_moodle40-*.zip',
@@ -123,6 +123,8 @@ Copy-Tree (Join-Path $Root 'remote') (Join-Path $distDir 'remote')
 Copy-Tree (Join-Path $Root 'restore') (Join-Path $distDir 'restore')
 Copy-PluginPackage -DestinationRoot $distDir
 Copy-Item -LiteralPath (Join-Path $Root 'README.md') -Destination (Join-Path $distDir 'README.md') -Force
+Copy-Item -LiteralPath (Join-Path $Root 'VERSION') -Destination (Join-Path $distDir 'VERSION') -Force
+Copy-Item -LiteralPath (Join-Path $Root 'CHANGELOG.md') -Destination (Join-Path $distDir 'CHANGELOG.md') -Force
 Copy-Item -LiteralPath (Join-Path $Root 'LICENSE') -Destination (Join-Path $distDir 'LICENSE') -Force
 Copy-Item -LiteralPath (Join-Path $Root 'THIRD_PARTY_LICENSES.txt') -Destination (Join-Path $distDir 'THIRD_PARTY_LICENSES.txt') -Force
 
@@ -148,7 +150,11 @@ First run:
 Updating backup scripts without rebuilding the exe: replace the remote\ folder from a newer build, then Deploy scripts in the GUI.
 '@ | Set-Content -LiteralPath $portableReadme -Encoding UTF8
 
-$zipPath = Join-Path $Root 'dist\Moo-backup-portable.zip'
+$appVersion = (Get-Content -LiteralPath (Join-Path $Root 'VERSION') -TotalCount 1).Trim()
+if ($appVersion -notmatch '^\d+\.\d+\.\d+([-+][0-9A-Za-z.-]+)?$') {
+    throw "Invalid VERSION: '$appVersion' (expected SemVer, e.g. 1.0.0)"
+}
+$zipPath = Join-Path $Root "dist\Moo-backup-portable-$appVersion.zip"
 if (Test-Path -LiteralPath $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force
 }

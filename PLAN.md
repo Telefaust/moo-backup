@@ -2,7 +2,7 @@
 
 > **Назначение документа:** единый контекст для продолжения работы без истории чата.  
 > **Статус:** реализовано и отлажено на production-хосте (Moodle 5.1, пользователь `scripter`).  
-> **Последнее обновление:** 28 июня 2026.
+> **Последнее обновление:** 9 ноября 2026.
 
 Пользовательская документация: [README.md](README.md).
 
@@ -187,7 +187,7 @@ Quiz-flow и maintenance без изменений; вместо dump/tar — `s
 
 ## Сборка Windows-дистрибутива (PyInstaller)
 
-> **Статус:** реализовано (`build-gui.ps1`, `moo-backup.spec`, `gui/paths.py`). Артефакт: `dist/Moo-backup-portable.zip`.
+> **Статус:** реализовано (`build-gui.ps1`, `moo-backup.spec`, `gui/paths.py`). Артефакт: `dist/Moo-backup-portable-<версия>.zip` (версия из `VERSION`).
 
 ### Цель
 
@@ -284,7 +284,7 @@ dist\Moo-backup\
         └── moodle-plugin\  (+ dist\*.zip)
         │
         ▼  Compress-Archive
-dist\Moo-backup-portable.zip
+dist\Moo-backup-portable-<версия>.zip
 ```
 
 - **`dist\`** — каталог артефактов сборки; в git не коммитить (`dist/`, `build/` → `.gitignore`).
@@ -321,7 +321,7 @@ dist\Moo-backup-portable.zip
 | Где лежит exe | Корень пакета, не `gui\` |
 | Где `remote/` | Рядом с exe (`app_root()`), не только в `_internal` |
 | `moodle-plugin/` | В portable ZIP с `dist/*.zip` для каждого нового prod |
-| `dist\` | Staging сборки; финальный артефакт — `Moo-backup-portable.zip` |
+| `dist\` | Staging сборки; финальный артефакт — `Moo-backup-portable-<версия>.zip` |
 | Обновление скриптов на хосте | По-прежнему **Deploy scripts** в GUI; пересборка exe не обязательна при изменении только `remote/` |
 
 ---
@@ -813,7 +813,7 @@ flowchart LR
 
 Первичный smoke-test **выполнен** (июнь 2026). Для **каждой новой версии** повторять чеклист:
 
-1. Распаковать `Moo-backup-portable.zip` на машине **без** системного Python.
+1. Распаковать `Moo-backup-portable-<версия>.zip` на машине **без** системного Python.
 2. Первый запуск → Connections, status bar.
 3. Connect (key/password), Deploy scripts.
 4. `--simulate` с активной quiz-попыткой.
@@ -833,7 +833,7 @@ flowchart LR
 
 ### Сборка GUI
 
-1. `.\build-gui.ps1` → `dist\Moo-backup-portable.zip`.
+1. `.\build-gui.ps1` → `dist\Moo-backup-portable-<версия>.zip`.
 2. README в пакете; `PLAN.md` — только в репозитории.
 3. Smoke-test собранного exe на машине **без** системного Python.
 

@@ -420,6 +420,10 @@ class SSHClient:
         for php in sorted(lib_dir.glob("*.php")):
             self.upload_file(php, f"{expanded}/lib/{php.name}")
 
+        version_file = project_root / "VERSION"
+        if version_file.is_file():
+            self.upload_file(version_file, f"{expanded}/VERSION")
+
         self.upload_file(restore_src / "moodle-restore.sh", f"{expanded}/moodle-restore.sh")
         self.upload_file(restore_src / "RESTORE.md", f"{expanded}/RESTORE.md")
 
@@ -429,7 +433,7 @@ class SSHClient:
             f'"{expanded}/setup-moodledata-acl.sh" '
             f'"{expanded}/lib/run_quiz_php.sh" '
             f'"{expanded}/lib/"*.sh && '
-            f'sed -i "s/\\r$//" "{expanded}"/*.sh "{expanded}/lib/"*.sh "{expanded}/lib/"*.php 2>/dev/null; true'
+            f'sed -i "s/\\r$//" "{expanded}"/*.sh "{expanded}/VERSION" "{expanded}/lib/"*.sh "{expanded}/lib/"*.php 2>/dev/null; true'
         )
         if code != 0:
             raise RuntimeError(f"chmod failed: {err}")

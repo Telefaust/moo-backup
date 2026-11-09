@@ -2,7 +2,7 @@
 
 Система резервного копирования сайта на Moodle: bash-скрипты на Linux-хосте и GUI под Windows.
 
-**Последнее обновление:** 28 июня 2026
+**Последнее обновление:** 9 ноября 2026
 
 ---
 
@@ -21,7 +21,9 @@
 | `gui/profiles.json` | Подключения и секреты (создаётся GUI)                                          |
 | `gui/keys/`         | SSH-ключи (по одному на профиль)                                               |
 | `run-gui.bat`       | Запуск GUI под Windows (с проверкой venv и зависимостей)                       |
-| `build-gui.ps1`     | Сборка portable ZIP (`dist/Moo-backup-portable.zip`)                           |
+| `build-gui.ps1`     | Сборка portable ZIP (`dist/Moo-backup-portable-<версия>.zip`)                  |
+| `VERSION`           | Версия проекта (SemVer), показывается в заголовке окна GUI                     |
+| `CHANGELOG.md`      | История изменений                                                              |
 
 ---
 
@@ -36,7 +38,7 @@
 Результат:
 
 - `dist\Moo-backup\` — распаковываемая папка (`Moo-backup.exe`, `_internal\`, `remote\`, `restore\`, `moodle-plugin\`, `gui\`)
-- `dist\Moo-backup-portable.zip` — архив для передачи на prod-рабочую станцию
+- `dist\Moo-backup-portable-<версия>.zip` — архив для передачи на prod-рабочую станцию
 
 На целевой Windows-машине: распаковать ZIP в любой каталог, запустить `Moo-backup.exe`. При **первом запуске** (нет `gui/profiles.json`) сразу открывается окно **Connections** — создайте профиль и нажмите **Save**. Плагины Moodle — из `moodle-plugin\dist\*.zip` (см. `moodle-plugin\README.md`).
 
@@ -202,7 +204,7 @@ Cron:
 | `moodlecode.tar.gz`               | Код Moodle                                                           |
 | `moodledata.tar.gz`               | Dataroot (с исключениями или `--full`)                               |
 | `contrib-plugins.txt`             | Список сторонних плагинов (может понадобиться при disaster recovery) |
-| `manifest.json`                   | Метаданные (`simulated: true` при `--simulate`)                      |
+| `manifest.json`                   | Метаданные (`moo_backup_version`, `simulated: true` при `--simulate`) |
 | `RESTORE.md`                      | Краткая инструкция restore                                           |
 | `backup.log` / `backup.error.log` | Журналы                                                              |
 | `control`                         | Временно: `force` / `cancel` во время ожидания quiz                  |
