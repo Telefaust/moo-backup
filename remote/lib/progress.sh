@@ -8,18 +8,47 @@ report_progress() {
     log_info "@PROGRESS ${step} ${pct} ${msg}"
 }
 
+# Log tar failure details: exit code, first lines of captured stderr, ACL hint.
+_tar_log_failure() {
+    local rc="$1"
+    local errfile="${2:-}"
+    local total line
+
+    log_error "tar failed with exit code ${rc} (step: ${ERROR_STEP:-unknown})"
+    if [[ -n "${errfile}" && -s "${errfile}" ]]; then
+        total="$(wc -l < "${errfile}" | tr -d ' ')"
+        log_error "tar stderr (first 20 of ${total} lines):"
+        while IFS= read -r line; do
+            log_error "  ${line}"
+        done < <(head -n 20 "${errfile}")
+        if grep -qi 'permission denied' "${errfile}"; then
+            log_error "Hint: unreadable files in the source tree (e.g. copied in from outside, no ACL). Re-run setup-moodledata-acl.sh --user <backup user> --moodle-root <path>"
+        fi
+    fi
+}
+
 # GNU tar: 0 ok, 1 files changed during read, 2+ fatal. Keep archive on exit 1.
+# Fatal errors are logged with tar stderr and mapped to EXIT_ARCHIVE.
+# $3 (optional): file with captured tar stderr; always removed here.
 _tar_accept_exit() {
     local rc="$1"
     local out="$2"
+    local errfile="${3:-}"
+    local result=0
+
     if [[ ${rc} -eq 0 ]]; then
-        return 0
-    fi
-    if [[ ${rc} -eq 1 && -f "${out}" && -s "${out}" ]]; then
+        :
+    elif [[ ${rc} -eq 1 && -f "${out}" && -s "${out}" ]]; then
         log_warn "tar exited with 1 (files changed during read); archive kept: $(basename "${out}")"
-        return 0
+    else
+        _tar_log_failure "${rc}" "${errfile}"
+        result="${EXIT_ARCHIVE}"
     fi
-    return "${rc}"
+
+    if [[ -n "${errfile}" ]]; then
+        rm -f "${errfile}"
+    fi
+    return "${result}"
 }
 
 dir_size_bytes() {
@@ -73,7 +102,8 @@ _run_tar_with_checkpoints() {
     export MOOBACKUP_STEP="${step}"
     export MOOBACKUP_FCOUNT="${fcount}"
 
-    local tar_rc
+    local tar_rc errfile
+    errfile="$(mktemp)"
     set +e
     # shellcheck disable=SC2086
     tar -C "${parent}" "${tar_excludes[@]}" -czf "${out}" "${name}" \
@@ -83,10 +113,10 @@ _run_tar_with_checkpoints() {
             pct=$(( ${TAR_CHECKPOINT:-0} * 100 / ${MOOBACKUP_FCOUNT:-1} ))
             (( pct > 99 )) && pct=99
             echo "[$(date "+%Y-%m-%d %H:%M:%S")] [INFO] @PROGRESS ${MOOBACKUP_STEP} ${pct} files ${TAR_CHECKPOINT:-0}/${MOOBACKUP_FCOUNT}" 
-        '"'"''
+        '"'"'' 2>"${errfile}"
     tar_rc=$?
     set -e
-    _tar_accept_exit "${tar_rc}" "${out}"
+    _tar_accept_exit "${tar_rc}" "${out}" "${errfile}"
 }
 
 _run_tar_with_pv() {
@@ -113,16 +143,17 @@ _run_tar_with_pv() {
     ) &
     reader_pid=$!
 
-    local tar_rc
+    local tar_rc errfile
+    errfile="$(mktemp)"
     set +e
     # shellcheck disable=SC2086
-    tar -C "${parent}" "${tar_excludes[@]}" --warning=no-file-changed -cf - "${name}" 2>/dev/null | \
+    tar -C "${parent}" "${tar_excludes[@]}" --warning=no-file-changed -cf - "${name}" 2>"${errfile}" | \
         pv -f -n -s "${total}" 2>"${fifo}" | gzip > "${out}"
     tar_rc=${PIPESTATUS[0]}
     set -e
     wait "${reader_pid}" 2>/dev/null || true
     rm -f "${fifo}"
-    _tar_accept_exit "${tar_rc}" "${out}"
+    _tar_accept_exit "${tar_rc}" "${out}" "${errfile}"
 }
 
 run_tar_gzip_progress() {

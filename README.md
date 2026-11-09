@@ -286,6 +286,7 @@ php ~/moobackup/bin/lib/quiz_backup.php env-check --moodle-root=/var/www/moodle
 | Backup exit 6, quizaccess not installed     | Установить `quizaccess_backupnotice` (обязателен для quiz-prep)                     |
 | Новые попытки quiz во время ожидания бэкапа | `quizaccess_backupnotice` + Deploy `backup_notice.sh`                               |
 | Failed to list contrib plugins              | **Deploy scripts**; проверить `quiz_backup.php contrib-list` от пользователя бэкапа |
+| Backup exit 4, `tar failed with exit code 2` | В moodledata есть файлы без ACL (скопированы извне): повторно `sudo setup-moodledata-acl.sh --user … --moodle-root …`; детали — в логе (`tar stderr`) |
 
 ---
 
