@@ -8,6 +8,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- GUI: неудачное подключение (Connect, выбор другого connection, автоподключение) теперь пишется в окно лога: `Connecting to <host> ...` и `Connection to <host> failed: <причина>`.
+
 ### Added
 - `build-gui.ps1 -Unreleased`: сборка `Moo-backup-portable-unreleased.zip` для локальных коммитов; правило сборки ZIP при commit/push зафиксировано в CLAUDE.md.
 

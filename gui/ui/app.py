@@ -556,6 +556,7 @@ class BackuperApp(tk.Tk):
             self.log(f"Auto-connect failed: {exc}")
 
     def _connect(self) -> None:
+        self.log(f"Connecting to {self.config_data.host} ...")
         try:
             if self.ssh:
                 self.ssh.close()
@@ -577,6 +578,7 @@ class BackuperApp(tk.Tk):
             self._refresh_local()
         except Exception as exc:
             self._set_connection_disconnected()
+            self.log(f"Connection to {self.config_data.host} failed: {exc}")
             messagebox.showerror("Connection error", str(exc))
 
     def _require_ssh(self) -> SSHClient:
