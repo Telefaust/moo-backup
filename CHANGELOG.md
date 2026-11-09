@@ -8,6 +8,8 @@
 
 ## [Unreleased]
 
+## [1.0.3] — 2026-11-09
+
 ### Fixed
 - GUI: неудачное подключение (Connect, выбор другого connection, автоподключение) теперь пишется в окно лога: `Connecting to <host> ...` и `Connection to <host> failed: <причина>`.
 
