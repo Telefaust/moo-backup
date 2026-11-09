@@ -85,6 +85,11 @@ Copyright: `Andrey "Telefaust" Bogachev`
 - Record changes in `CHANGELOG.md` under `[Unreleased]`
 - Release: bump `VERSION`, move `[Unreleased]` to `[X.Y.Z] — date`, tag `vX.Y.Z` manually. Plugins keep their own versions (`version.php`)
 
+### Portable ZIP on commit / push
+- **Before `git push` to GitHub:** run `.\build-gui.ps1` → `dist\Moo-backup-portable-<VERSION>.zip` (versioned, as for a release)
+- **On a local commit (no push):** run `.\build-gui.ps1 -Unreleased` → `dist\Moo-backup-portable-unreleased.zip`
+- ZIPs stay in `dist/` (gitignored), never committed
+
 ### Never commit
 - `gui/profiles.json` — SSH credentials, in `.gitignore`
 - `gui/keys/` — SSH private keys, in `.gitignore`
@@ -100,7 +105,7 @@ Both are in `.gitignore`; contain absolute paths from build machine.
 .\build-gui.ps1
 ```
 
-Output: `dist\Moo-backup-portable-<version>.zip`
+Output: `dist\Moo-backup-portable-<version>.zip` (or `Moo-backup-portable-unreleased.zip` with `-Unreleased`)
 Also builds plugin ZIPs via `moodle-plugin\build-zip.py` → `moodle-plugin\dist\*.zip`
 
 Before each release: smoke-test the ZIP on a machine without Python (see Roadmap in PLAN.md).

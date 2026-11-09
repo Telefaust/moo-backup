@@ -8,6 +8,9 @@
 
 ## [Unreleased]
 
+### Added
+- `build-gui.ps1 -Unreleased`: сборка `Moo-backup-portable-unreleased.zip` для локальных коммитов; правило сборки ZIP при commit/push зафиксировано в CLAUDE.md.
+
 ## [1.0.2] — 2026-11-09
 
 ### Fixed

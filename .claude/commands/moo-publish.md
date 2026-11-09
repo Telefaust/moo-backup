@@ -14,6 +14,8 @@ Steps to perform in order:
 
 6. **Report.** Summarize: what's ready, what was updated, what will be committed. Show proposed commit message following the project style (e.g. `fix: ...`, `feat: ...`, `docs: ...`).
 
-7. **Stage and commit** the relevant files. Do NOT push — only commit locally.
+7. **Build the ZIP for the local commit:** `.\build-gui.ps1 -Unreleased` → `dist\Moo-backup-portable-unreleased.zip`. (Before any push to GitHub, build the versioned ZIP instead: `.\build-gui.ps1` → `dist\Moo-backup-portable-<VERSION>.zip`.)
+
+8. **Stage and commit** the relevant files. Do NOT push — only commit locally.
 
 Do not push to GitHub. Do not delete any files. Do not modify files outside the project directory.

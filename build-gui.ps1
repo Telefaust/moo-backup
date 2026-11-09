@@ -1,4 +1,10 @@
 # Build portable Windows GUI: PyInstaller onedir + remote/restore/moodle-plugin.
+# .\build-gui.ps1              -> dist\Moo-backup-portable-<VERSION>.zip   (release, before git push)
+# .\build-gui.ps1 -Unreleased  -> dist\Moo-backup-portable-unreleased.zip  (local commit)
+param(
+    [switch]$Unreleased
+)
+
 $ErrorActionPreference = 'Stop'
 
 $Root = $PSScriptRoot
@@ -154,7 +160,8 @@ $appVersion = (Get-Content -LiteralPath (Join-Path $Root 'VERSION') -TotalCount 
 if ($appVersion -notmatch '^\d+\.\d+\.\d+([-+][0-9A-Za-z.-]+)?$') {
     throw "Invalid VERSION: '$appVersion' (expected SemVer, e.g. 1.0.0)"
 }
-$zipPath = Join-Path $Root "dist\Moo-backup-portable-$appVersion.zip"
+$zipSuffix = if ($Unreleased) { 'unreleased' } else { $appVersion }
+$zipPath = Join-Path $Root "dist\Moo-backup-portable-$zipSuffix.zip"
 if (Test-Path -LiteralPath $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force
 }
